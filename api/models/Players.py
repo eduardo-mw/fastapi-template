@@ -1,9 +1,10 @@
-from pydantic import ConfigDict, BaseModel, Field
+from datetime import datetime
+from typing import List, Optional
+
+from bson import ObjectId
+from pydantic import BaseModel, ConfigDict, Field
 from pydantic.functional_validators import BeforeValidator
 from typing_extensions import Annotated
-from typing import Optional, List
-from bson import ObjectId
-from datetime import datetime
 
 # Represents an ObjectId field in the database.
 # It will be represented as a `str` on the model
