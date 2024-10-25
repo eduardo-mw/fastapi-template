@@ -32,10 +32,11 @@ class PlayerModel(BaseModel):
     # Defaults to none so id does not need to be provided upon creation
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str = Field(...)
-    displayName: str = Field(...)
-    iconUrl: str = Field(...)
-    createdAt: datetime = Field(...)
-    updatedAt: datetime = Field(...)
+    displayName: str = Field()
+    iconUrl: str = Field(default="https://placehold.co/128x128.webp")
+    # Get the current time in ISO 8601 format
+    createdAt: datetime = Field(default=datetime.now().isoformat())
+    updatedAt: datetime = Field(default=datetime.now().isoformat())
     model_config = ConfigDict(
         populate_by_name=True,
         arbitrary_types_allowed=True,

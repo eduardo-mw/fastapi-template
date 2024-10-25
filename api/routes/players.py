@@ -4,7 +4,7 @@ from typing import Annotated
 
 from bson import ObjectId
 from dependencies import get_db
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status, Body
 from models.Players import PlayerCollection, PlayerModel
 from motor.motor_asyncio import AsyncIOMotorDatabase
 
@@ -108,23 +108,33 @@ async def delete_player(player_id: str, db: DbDep) -> PlayerModel:
     raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
 
 
-# @players_router.post(
-#     "/",
-#     response_description="Add a new player",
-#     response_model=PlayerModel,
-#     status_code=status.HTTP_201_CREATED,
-#     response_model_by_alias=False,
-# )
-# async def create_player(player: PlayerModel = Body(...)):
-#     """Insert a new player record
+@players_router.post(
+    "/",
+    response_description="Add a new player",
+    response_model=PlayerModel,
+    status_code=status.HTTP_201_CREATED,
+    response_model_by_alias=False,
+)
+async def create_player(db: DbDep, player: PlayerModel = Body(...)) -> PlayerModel:
+    """Create a new player
 
-#     Parameters
-#     ----------
-#     player : PlayerModel, optional
-#         Player JSON request, by default Body(...)
-#     """
-#     # new_player = await player_collection.insert_one(
-#     #     player.model_dump(by_alias=True, exclude=["id"])
-#     # )
-#     # created_player = await player_collection.find_one({"_id": new_player.inserted_id})
-#     return {"hello": "world"}
+    Parameters
+    ----------
+    db : DbDep
+        database
+    player : PlayerModel, optional
+        JSON request for new player, by default Body(...)
+
+    Returns
+    -------
+    PlayerModel
+        Newly created player
+    """
+    player_collection = db.get_collection("players")
+    new_player = await player_collection.insert_one(
+        player.model_dump(by_alias=True, exclude=["id"])
+    )
+    created_player = await player_collection.find_one(
+        {"_id": new_player.inserted_id}
+    )
+    return created_player
