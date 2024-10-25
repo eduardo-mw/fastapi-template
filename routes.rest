@@ -1,0 +1,65 @@
+##### PLAYERS #####
+GET http://localhost:8000/players HTTP/1.1
+
+###
+
+GET http://localhost:8000/players/<id> HTTP/1.1
+
+###
+
+DELETE http://localhost:8000/players/<id> HTTP/1.1
+
+###
+
+POST http://localhost:8000/players HTTP/1.1
+content-type: application/json
+
+{
+    "name": "John Doe",
+    "displayName": "jd001"
+}
+
+###
+
+PUT http://localhost:8000/players/<id> HTTP/1.1
+content-type: application/json
+
+{
+    "name": "<New Name>",
+    "displayName": "<New Display Name>"
+}
+
+##### MATCHES #####
+
+GET http://localhost:8000/matches HTTP/1.1
+
+###
+
+GET http://localhost:8000/matches/<id> HTTP/1.1
+
+###
+
+DELETE http://localhost:8000/matches/<id> HTTP/1.1
+
+###
+
+POST http://localhost:8000/matches HTTP/1.1
+content-type: application/json
+
+{
+    "player1Id": "<id>",
+    "player2Id": "<id>"
+}
+
+### 
+
+PUT http://localhost:8000/matches/<id> HTTP/1.1
+content-type: application/json
+
+{
+    "player1Id": "<New ID>",
+    "player2Id": "<New ID>", 
+    "player1Score": 1,
+    "player2Score": 2,
+    "status": 1
+} 

@@ -1,0 +1,51 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fastapi-template"
+version = "0.0.1"
+dependencies = ["fastapi[standard]", "motor", "python-dotenv"]
+requires-python = ">=3.12"
+authors = [
+  {name = "John Doe", email = "john.doe@example.com"},
+]
+maintainers = [
+  {name = "John Doe", email = "john.doe@example.com"},
+]
+description = "A Fast API template"
+readme = "README.md"
+keywords = ["fastapi", "template"]
+# license = {file = "LICENSE.txt"}
+classifiers = [
+  "Programming Language :: Python"
+]
+
+[project.optional-dependencies]
+dev = ["pip-tools", "pylint", "black", "python-dotenv", "isort"]
+
+[project.urls]
+Homepage = "https://example.com"
+Documentation = "https://readthedocs.org"
+Repository = "https://github.com/me/example.git"
+"Bug Tracker" = "https://github.com/me/example/issues"
+Changelog = "https://github.com/me/example/blob/master/CHANGELOG.md"
+
+# Executing this command will do the equivalent of from example import main_cli; main_cli()
+# [project.scripts]
+# example-cli = "scripts:main_cli"
+
+# On Windows, scripts packaged this way need a terminal, so if you launch them from
+# within a graphical application, they will make a terminal pop up. To prevent this from 
+# happening, use the [project.gui-scripts] table instead of [project.scripts].
+# [project.gui-scripts]
+# example-gui = "example:main_gui"
+
+# [project.entry-points."example.magical"]
+# ex = "example:main_example"
+
+[tool.pylint.format]
+max-line-length = "88"
+
+[tool.isort]
+profile = "black"
