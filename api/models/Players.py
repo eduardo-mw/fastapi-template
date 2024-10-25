@@ -27,8 +27,9 @@ class PlayerModel(BaseModel):
     """
 
     # The primary key for the PlayerModel, stored as a `str` on the instance.
-    # This will be aliased to `_id` when sent to MongoDB,
+    # This will be aliased to `_id` when sent to MongoDB, due to pythons _id
     # but provided as `id` in the API requests and responses.
+    # Defaults to none so id does not need to be provided upon creation
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str = Field(...)
     displayName: str = Field(...)

@@ -1,8 +1,12 @@
-from fastapi import APIRouter, Depends
-from models.Players import PlayerCollection
-from dependencies import get_db
-from motor.motor_asyncio import AsyncIOMotorDatabase
+"""Players routes"""
+
 from typing import Annotated
+
+from bson import ObjectId
+from dependencies import get_db
+from fastapi import APIRouter, Depends, HTTPException
+from models.Players import PlayerCollection, PlayerModel
+from motor.motor_asyncio import AsyncIOMotorDatabase
 
 players_router = APIRouter()
 DbDep = Annotated[AsyncIOMotorDatabase, Depends(get_db)]
@@ -16,15 +20,56 @@ DbDep = Annotated[AsyncIOMotorDatabase, Depends(get_db)]
     tags=["players"],
 )
 async def list_players(db: DbDep) -> PlayerCollection:
+    """List all players
+
+    Parameters
+    ----------
+    db : DbDep
+        database
+
+    Returns
+    -------
+    PlayerCollection
+        A list of all players
+    """
     player_collection = db.get_collection("players")
-    return PlayerCollection(players=await player_collection.find().to_list(
-        1000
-        ))
+    response = PlayerCollection(players=await player_collection.find().to_list(1000))
+    return response
 
 
-# @players_router.get("/{player_id}", tags=["players"])
-# async def read_player(player_id: str):
-#     return {"player_id": player_id}
+@players_router.get(
+    "/{player_id}",
+    tags=["players"],
+    response_description="Get a single student",
+    response_model=PlayerModel,
+    response_model_by_alias=False,
+)
+async def read_player(player_id: str, db: DbDep) -> PlayerModel:
+    """Get a single player
+
+    Parameters
+    ----------
+    player_id : str
+        Player id
+    db : DbDep
+        database
+
+    Returns
+    -------
+    PlayerModel
+        Single player
+
+    Raises
+    ------
+    HTTPException
+    """
+    player_collection = db.get_collection("players")
+    if (
+        player := await player_collection.find_one({"_id": ObjectId(player_id)})
+    ) is not None:
+        return player
+
+    raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
 
 
 # @players_router.delete("/{player_id}", tags=["players"])
