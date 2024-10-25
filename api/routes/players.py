@@ -72,9 +72,40 @@ async def read_player(player_id: str, db: DbDep) -> PlayerModel:
     raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
 
 
-# @players_router.delete("/{player_id}", tags=["players"])
-# async def delete_player(player_id: str):
-#     return {"player_id": player_id}
+@players_router.delete(
+    "/{player_id}",
+    tags=["players"],
+    response_description="Delete a single student",
+    response_model=PlayerModel,
+    response_model_by_alias=False,
+)
+async def delete_player(player_id: str, db: DbDep) -> PlayerModel:
+    """Delete a single player
+
+    Parameters
+    ----------
+    player_id : str
+        Player ID
+    db : DbDep
+        database
+
+    Returns
+    -------
+    PlayerModel
+        The player that was deleted
+
+    Raises
+    ------
+    HTTPException
+    """
+    player_collection = db.get_collection("players")
+    if (
+        player := await player_collection.find_one_and_delete(
+            {"_id": ObjectId(player_id)}
+        )
+    ) is not None:
+        return player
+    raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
 
 
 # @players_router.post(
