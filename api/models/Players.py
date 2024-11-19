@@ -59,9 +59,9 @@ class UpdatePlayerModel(BaseModel):
 
     name: str = Field(...)
     displayName: str = Field(...)
-    iconUrl: str = Field(...)
-    createdAt: datetime = Field(...)
-    updatedAt: datetime = Field(...)
+    iconUrl: str = Field(default="https://placehold.co/128x128.webp")
+    createdAt: datetime = Field(default=datetime.now().isoformat())
+    updatedAt: datetime = Field(default=datetime.now().isoformat())
     model_config = ConfigDict(
         arbitrary_types_allowed=True,
         json_encoders={ObjectId: str},
