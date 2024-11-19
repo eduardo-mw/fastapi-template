@@ -42,7 +42,7 @@ async def list_players(db: DbDep) -> PlayerCollection:
 @players_router.get(
     "/{player_id}",
     tags=["players"],
-    response_description="Get a single student",
+    response_description="Get a single player",
     response_model=PlayerModel,
     response_model_by_alias=False,
 )
@@ -77,7 +77,7 @@ async def read_player(player_id: str, db: DbDep) -> PlayerModel:
 @players_router.delete(
     "/{player_id}",
     tags=["players"],
-    response_description="Delete a single student",
+    response_description="Delete a single player",
     response_model=PlayerModel,
     response_model_by_alias=False,
 )
@@ -146,7 +146,7 @@ async def create_player(db: DbDep, player: PlayerModel = Body(...)) -> PlayerMod
     response_model=PlayerModel,
     response_model_by_alias=False,
 )
-async def update_plyaer(
+async def update_player(
     player_id: str, db: DbDep, player: UpdatePlayerModel = Body(...)
 ):
     """
@@ -168,12 +168,10 @@ async def update_plyaer(
         if update_result is not None:
             return update_result
         else:
-            raise HTTPException(
-                status_code=404, detail=f"Student {player_id} not found"
-            )
+            raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
     # The update is empty, but we should still return the matching document:
     if (
-        existing_student := await player_collection.find_one({"_id": player_id})
+        existing_player := await player_collection.find_one({"_id": player_id})
     ) is not None:
-        return existing_student
-    raise HTTPException(status_code=404, detail=f"Student {player_id} not found")
+        return existing_player
+    raise HTTPException(status_code=404, detail=f"Player {player_id} not found")
