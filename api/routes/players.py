@@ -5,8 +5,10 @@ from typing import Annotated
 from bson import ObjectId
 from dependencies import get_db
 from fastapi import APIRouter, Depends, HTTPException, status, Body
-from models.Players import PlayerCollection, PlayerModel
+from models.Players import PlayerCollection, PlayerModel, UpdatePlayerModel
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pymongo import ReturnDocument
+
 
 players_router = APIRouter()
 DbDep = Annotated[AsyncIOMotorDatabase, Depends(get_db)]
@@ -134,7 +136,44 @@ async def create_player(db: DbDep, player: PlayerModel = Body(...)) -> PlayerMod
     new_player = await player_collection.insert_one(
         player.model_dump(by_alias=True, exclude=["id"])
     )
-    created_player = await player_collection.find_one(
-        {"_id": new_player.inserted_id}
-    )
+    created_player = await player_collection.find_one({"_id": new_player.inserted_id})
     return created_player
+
+
+@players_router.put(
+    "/{player_id}",
+    response_description="Update a player",
+    response_model=PlayerModel,
+    response_model_by_alias=False,
+)
+async def update_plyaer(
+    player_id: str, db: DbDep, player: UpdatePlayerModel = Body(...)
+):
+    """
+    Update individual fields of an existing player record.
+    Only the provided fields will be updated.
+    Any missing or `null` fields will be ignored.
+    """
+    player_collection = db.get_collection("players")
+
+    player = {
+        k: v for k, v in player.model_dump(by_alias=True).items() if v is not None
+    }
+    if len(player) >= 1:
+        update_result = await player_collection.find_one_and_update(
+            {"_id": ObjectId(player_id)},
+            {"$set": player},
+            return_document=ReturnDocument.AFTER,
+        )
+        if update_result is not None:
+            return update_result
+        else:
+            raise HTTPException(
+                status_code=404, detail=f"Student {player_id} not found"
+            )
+    # The update is empty, but we should still return the matching document:
+    if (
+        existing_student := await player_collection.find_one({"_id": player_id})
+    ) is not None:
+        return existing_student
+    raise HTTPException(status_code=404, detail=f"Student {player_id} not found")
